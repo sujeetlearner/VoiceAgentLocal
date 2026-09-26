@@ -1,0 +1,6 @@
+{
+  "name": "KokoroVoice Studio - LiveKit & Ollama Agent",
+  "description": "Local, private-first voice agent studio powered by hexgrad/Kokoro-82M TTS, LiveKit, and Ollama LLM. Features visual decision tree flows, 24/7 background execution, call recording, and localized transcripts.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
