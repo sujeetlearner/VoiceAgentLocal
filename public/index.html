@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KokoroVoice — Local Voice Agent Studio</title>
+<link rel="stylesheet" href="/style.css?v=20260926" />
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2.9.7/dist/livekit-client.umd.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">◉</span> Kokoro<span>Voice</span></div>
+  <div class="status">
+    <span id="lv-status" class="pill">livekit …</span>
+    <span id="ollama-status" class="pill">ollama …</span>
+    <span id="synth-status" class="pill">tts …</span>
+    <span id="worker-status" class="pill">daemon …</span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="call" class="active">📞 Call Studio</button>
+  <button data-tab="flow">🌳 Decision Flow</button>
+  <button data-tab="voice">🎙️ Voice &amp; Models</button>
+  <button data-tab="recordings">💾 Recordings</button>
+  <button data-tab="daemon">🔁 24/7 Daemon</button>
+</nav>
+
+<main>
+  <!-- ============ CALL STUDIO ============ -->
+  <section id="tab-call" class="tab active">
+    <div class="call-panel">
+      <div class="call-avatar" id="call-avatar">B</div>
+      <div class="call-name" id="call-name">Bella</div>
+      <div class="call-state" id="call-state">idle — start the daemon, then press Call</div>
+      <div class="call-controls">
+        <button id="btn-call" class="primary big">📞 Call</button>
+        <button id="btn-hangup" class="danger big" disabled>End Call</button>
+      </div>
+      <div class="level" id="level"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <p class="hint">Browser mic → LiveKit (WebRTC) → local agent. Everything runs on this computer.</p>
+    </div>
+    <div class="transcript">
+      <div class="transcript-head">Live call transcript <button id="btn-clear-events" class="mini">clear</button></div>
+      <div id="transcript-body" class="transcript-body"><div class="empty">No active call yet.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ DECISION FLOW ============ -->
+  <section id="tab-flow" class="tab">
+    <div class="panel-head"><h2>Agent decision flow</h2>
+      <button id="btn-add-node" class="primary">+ add rule</button>
+      <button id="btn-save-config" class="primary">💾 Save config</button>
+    </div>
+    <div class="form-grid">
+      <label>Agent name <input id="cfg-name" /></label>
+      <label>Business <input id="cfg-business" /></label>
+      <label>Welcome message <input id="cfg-welcome" class="wide" /></label>
+    </div>
+    <div id="tree" class="tree"></div>
+    <p class="hint">Rules are matched top-to-bottom. <b>book</b> = confirm + take details · <b>escalate</b> = hand to a human · <b>end</b> = goodbye. The worker reloads config on every call.</p>
+  </section>
+
+  <!-- ============ VOICE & MODELS ============ -->
+  <section id="tab-voice" class="tab">
+    <div class="panel-head"><h2>Voice &amp; model settings</h2>
+      <button id="btn-save-voice" class="primary">💾 Save settings</button>
+    </div>
+    <div class="form-grid cols3">
+      <label>LLM (via local Ollama) <select id="cfg-llm"></select></label>
+      <label>LLM temperature <input id="cfg-llm_temp" type="number" step="0.1" min="0" max="1" /></label>
+      <label>STT model <select id="cfg-stt"><option>tiny</option><option>base</option><option>small</option><option>medium</option><option>large-v3</option></select></label>
+      <label>TTS engine <select id="cfg-tts"></select></label>
+      <label>Voice <select id="cfg-voice"></select></label>
+      <label>Language <select id="cfg-lang">
+          <option value="en">English</option><option value="hi">Hindi (हिन्दी)</option>
+          <option value="es">Spanish (Español)</option><option value="fr">French (Français)</option>
+          <option value="de">German (Deutsch)</option><option value="it">Italian (Italiano)</option>
+          <option value="pt">Portuguese (Português)</option><option value="ru">Russian (Русский)</option>
+          <option value="ar">Arabic (العربية)</option><option value="ja">Japanese (日本語)</option>
+          <option value="ko">Korean (한국어)</option><option value="zh">Chinese (中文)</option>
+          <option value="bn">Bengali (বাংলা)</option><option value="ta">Tamil (தமிழ்)</option>
+          <option value="te">Telugu (తెలుగు)</option><option value="mr">Marathi (मराठी)</option>
+      </select></label>
+      <label>Speech speed <input id="cfg-speed" type="number" step="0.1" min="0.6" max="1.6" value="1.0" /></label>
+      <label>Emotion <select id="cfg-emotion"><option>natural</option><option>cheerful</option><option>empathetic</option><option>calm</option></select></label>
+      <label>Tone preset <select id="cfg-tone-preset">
+          <option value="professional">Professional &amp; poised</option>
+          <option value="friendly">Friendly &amp; upbeat</option>
+          <option value="empathetic">Warm &amp; empathetic</option>
+          <option value="energetic">Cheerful &amp; energetic</option>
+          <option value="formal">Formal &amp; courteous</option>
+          <option value="custom">Custom (write your own)</option>
+      </select></label>
+      <label>Tone (custom) <input id="cfg-tone" placeholder="e.g. warm, friendly, slightly humorous" /></label>
+    </div>
+    <div class="form-grid">
+      <label class="wide">How it should talk (extra instructions, applied on every call)
+        <textarea id="cfg-instructions" class="wide" rows="3"
+          placeholder="e.g. Greet the caller by name once. Never repeat questions. Always confirm the time before booking. Express genuine care about the patient's comfort."></textarea>
+      </label>
+    </div>
+    <div class="test-row">
+      <input id="tts-text" class="wide" value="Hi there! I'm Bella, your virtual assistant. I can book appointments and answer questions, twenty four seven." />
+      <button id="btn-test-voice" class="primary">▶ Test voice</button>
+    </div>
+    <audio id="tts-audio" controls style="display:none"></audio>
+    <div id="provider-info" class="provider-info"></div>
+  </section>
+
+  <!-- ============ RECORDINGS ============ -->
+  <section id="tab-recordings" class="tab">
+    <div class="panel-head"><h2>Recorded calls (stored locally)</h2><button id="btn-refresh-rec" class="mini">refresh</button></div>
+    <div id="recordings" class="recordings"><div class="empty">No recordings yet.</div></div>
+  </section>
+
+  <!-- ============ DAEMON ============ -->
+  <section id="tab-daemon" class="tab">
+    <div class="daemon-card">
+      <h2>24/7 background voice agent</h2>
+      <p>The agent worker runs as a background process and keeps answering calls even when this window is closed. Pause freezes it instantly; Stop terminates it. It keeps working after the computer wakes back up.</p>
+      <div class="call-controls">
+        <button id="daemon-start" class="primary big">▶ Start daemon</button>
+        <button id="daemon-pause" class="warn big">⏸ Pause</button>
+        <button id="daemon-resume" class="primary big">▶ Resume</button>
+        <button id="daemon-stop" class="danger big">⏹ Stop</button>
+      </div>
+      <label class="check"><input type="checkbox" id="auto-restart" checked /> auto-restart if it crashes</label>
+      <button id="daemon-install" class="mini">install launchd (start at login, survive reboots)</button>
+      <div id="daemon-log"></div>
+    </div>
+  </section>
+</main>
+
+<script src="/app.js?v=20260926"></script>
+</body>
+</html>

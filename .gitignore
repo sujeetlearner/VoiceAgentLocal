@@ -6,3 +6,19 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# python
+**/__pycache__/
+*.py[cod]
+agent/.venv/
+tts/.venv*/
+
+# runtime call data (privacy - transcripts/audio/PII)
+data/recordings/
+data/calls.json
+data/worker.pid
+data/*.wav
+data/*.m4a
+
+# vendored dependency (clone separately: tts/hinglish-tts)
+tts/hinglish-tts/

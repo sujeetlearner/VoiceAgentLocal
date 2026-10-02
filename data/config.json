@@ -1,0 +1,83 @@
+{
+  "name": "Bella",
+  "business": "Sunny Dental Care",
+  "language": "en",
+  "tone": "warm and professional",
+  "instructions": "",
+  "llm": "qwen2.5:7b-instruct",
+  "llm_temperature": 0.3,
+  "stt_model": "base",
+  "tts_provider": "kokoro",
+  "tts_voice": "af_bella",
+  "tts_speed": 0.9,
+  "tts_emotion": "natural",
+  "hinglish": true,
+  "welcome": "Hi, I'm Bella, your virtual assistant. How can I help you today?",
+  "max_turns": 40,
+  "idle_timeout_s": 60,
+  "record_calls": false,
+  "tree": [
+    {
+      "id": "n1",
+      "kind": "condition",
+      "message": "Thanks for calling. How can I help you today?",
+      "reply": "",
+      "listen_for": [],
+      "action": "reply"
+    },
+    {
+      "id": "n2",
+      "kind": "condition",
+      "message": "",
+      "reply": "Great, I can help you book that. May I have your name and a preferred time please?",
+      "listen_for": [
+        "book",
+        "appointment",
+        "schedule"
+      ],
+      "action": "book"
+    },
+    {
+      "id": "n3",
+      "kind": "condition",
+      "message": "",
+      "reply": "The consultation is 500 rupees, and booking is free. Would you like me to book a slot for you?",
+      "listen_for": [
+        "price",
+        "cost",
+        "fees",
+        "charge"
+      ],
+      "action": "reply"
+    },
+    {
+      "id": "n4",
+      "kind": "condition",
+      "message": "",
+      "reply": "Of course, let me connect you to a human agent right away.",
+      "listen_for": [
+        "human",
+        "agent",
+        "person",
+        "manager",
+        "complaint",
+        "refund"
+      ],
+      "action": "escalate"
+    },
+    {
+      "id": "n5",
+      "kind": "condition",
+      "message": "",
+      "reply": "Thank you for calling, have a wonderful day!",
+      "listen_for": [
+        "bye",
+        "goodbye",
+        "thank you",
+        "thanks",
+        "done"
+      ],
+      "action": "end"
+    }
+  ]
+}
